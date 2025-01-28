@@ -5,71 +5,177 @@ namespace App\Http\Controllers\Api;
 use App\Models\Employee;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
 
 class EmployeeController extends Controller
 {
-    //
     // Get all employees
-    public function index()
+    // public function index()
+    // {
+    //     $employees = Employee::with([
+    //         'user:id,email',
+    //         'employments' => function($query) {
+    //             $query->select('id', 'employee_id', 'employment_type_id', 'position_id', 'department_id', 'work_location_id', 'supervisor_id')
+    //                 ->with([
+    //                     'employmentType:id,name',
+    //                     'position:id,title',
+    //                     'department:id,name',
+    //                     'workLocation:id,name,type',
+    //                     'supervisor:id,first_name,last_name'
+    //                 ]);
+    //         }
+    //     ])
+    //     ->whereHas('employments')
+    //     ->get(['id', 'user_id', 'staff_id', 'first_name', 'middle_name', 'last_name', 'mobile_phone', 'status']); // Select only necessary columns from the Employee table
+
+    //     return response()->json($employees);
+    // }
+
+    public function index(Request $request)
     {
         $employees = Employee::with([
+                'user:id,email',
+                'employments' => function($query) {
+                    $query->select('id', 'employee_id', 'employment_type_id', 'position_id', 'department_id', 'work_location_id', 'supervisor_id', 'start_date')
+                        ->with([
+                            'employmentType:id,name',
+                            'position:id,title',
+                            'department:id,name',
+                            'workLocation:id,name,type',
+                            'supervisor:id,first_name,last_name'
+                        ]);
+                }
+            ])
+            ->whereHas('employments', function($query) use ($request) {
+                // Add department filter
+                if ($request->has('department_id')) {
+                    $query->where('department_id', $request->department_id);
+                }
+                
+                // Add site (work location) filter
+                if ($request->has('site_id')) {
+                    $query->where('work_location_id', $request->site_id);
+                }
+            })
+            ->get(['id', 'user_id', 'staff_id', 'first_name', 'middle_name', 'last_name', 'mobile_phone', 'status',]); // Select only necessary columns from the Employee table
+
+        return response()->json($employees);
+    }
+
+    // Get a single employee by ID
+    public function show($id)
+    {
+        $employee = Employee::with([
             'user:id,email',
             'employments' => function($query) {
-                $query->with([
-                    'employmentType:id,name',
-                    'position:id,title',
-                    'department:id,name',
-                    'workLocation:id,name,type',
-                    'supervisor:id,first_name,last_name'
-                ]);
+                $query->select('id', 'employee_id', 'employment_type_id', 'position_id', 'department_id', 'work_location_id', 'supervisor_id')
+                    ->with([
+                        'employmentType:id,name',
+                        'position:id,title',
+                        'department:id,name',
+                        'workLocation:id,name,type',
+                        'supervisor:id,first_name,last_name'
+                    ]);
             }
         ])
         ->whereHas('employments')
-        ->get();
-        return response()->json($employees);
+        ->find($id, ['id', 'user_id', 'staff_id']); // Find the employee by ID and select specific columns
+
+        if (!$employee) {
+            return response()->json(['message' => 'Employee not found'], 404); // Return a 404 response if the employee is not found
+        }
+
+        return response()->json($employee);
     }
 
     // Get all employees related to a department
-    public function employeesByDepartment($departmentId)
-    {
-        $employees = Employee::with([
-            'user:id,email',
-            'employments' => function($query) {
-                $query->with([
-                    'employmentType:id,name',
-                    'position:id,title',
-                    'department:id,name',
-                    'workLocation:id,name,type',
-                    'supervisor:id,first_name,last_name'
-                ]);
-            }
-        ])
-        ->whereHas('employments', function($query) use ($departmentId) {
-            $query->where('department_id', $departmentId);
-        })
-        ->get();
-        return response()->json($employees);
-    }
+    // public function employeesByDepartment($departmentId)
+    // {
+    //     $employees = Employee::with([
+    //         'user:id,email',
+    //         'employments' => function($query) {
+    //             $query->with([
+    //                 'employmentType:id,name',
+    //                 'position:id,title',
+    //                 'department:id,name',
+    //                 'workLocation:id,name,type',
+    //                 'supervisor:id,first_name,last_name'
+    //             ]);
+    //         }
+    //     ])
+    //     ->whereHas('employments', function($query) use ($departmentId) {
+    //         $query->where('department_id', $departmentId);
+    //     })
+    //     ->get();
+    //     return response()->json($employees);
+    // }
 
     // Get all employees related to work location
-    public function employeesByWorkLocation($workLocationId)
+    // public function employeesByWorkLocation($workLocationId)
+    // {
+    //     $employees = Employee::with([
+    //         'user:id,email',
+    //         'employments' => function($query) {
+    //             $query->with([
+    //                 'employmentType:id,name',
+    //                 'position:id,title',
+    //                 'department:id,name',
+    //                 'workLocation:id,name,type',
+    //                 'supervisor:id,first_name,last_name'
+    //             ]);
+    //         }
+    //     ])
+    //     ->whereHas('employments', function($query) use ($workLocationId) {
+    //         $query->where('work_location_id', $workLocationId);
+    //     })
+    //     ->get();
+    //     return response()->json($employees);
+    // }
+
+    public function search(Request $request)
     {
-        $employees = Employee::with([
-            'user:id,email',
-            'employments' => function($query) {
-                $query->with([
-                    'employmentType:id,name',
-                    'position:id,title',
-                    'department:id,name',
-                    'workLocation:id,name,type',
-                    'supervisor:id,first_name,last_name'
-                ]);
-            }
-        ])
-        ->whereHas('employments', function($query) use ($workLocationId) {
-            $query->where('work_location_id', $workLocationId);
-        })
-        ->get();
+        $request->validate([
+            'search' => 'required|string|max:255',
+        ], [
+            'search.required' => 'The search field is required.',
+            'search.string'   => 'The search field must be a string.',
+            'search.max'      => 'The search field must not exceed 255 characters.',
+        ]);
+
+        $search = $request->input('search');
+
+        $employees = Employee::select([
+                'id', 'user_id', 'staff_id', 
+                'first_name', 'middle_name', 
+                'last_name', 'mobile_phone', 'status'
+            ])
+            ->with([
+                'user:id,email',
+                'employments' => function($query) {
+                    $query->select(
+                        'id', 'employee_id', 'employment_type_id', 
+                        'position_id', 'department_id', 
+                        'work_location_id', 'supervisor_id'
+                    )
+                    ->with([
+                        'employmentType:id,name',
+                        'position:id,title',
+                        'department:id,name',
+                        'workLocation:id,name,type',
+                        'supervisor:id,first_name,last_name'
+                    ]);
+                }
+            ])
+            ->whereHas('employments') // Include only employees with employments
+            ->where(function($query) use ($search) {
+                $query->where('staff_id', 'like', "%{$search}%")
+                    ->orWhere('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]);
+            })
+            ->get(); // Retrieve all results
+
         return response()->json($employees);
     }
 
@@ -113,19 +219,14 @@ class EmployeeController extends Controller
         ]);
 
         $employee = Employee::create($validated);
-        return response()->json($employee, 201);
+
+        return response()->json([
+            'message' => 'Employee created successfully',
+            'employee' => $employee
+        ], 201);
     }
 
-    // Show a single employee
-    public function show($id)
-    {
-        $employee = Employee::find($id);
-        if (!$employee) {
-            return response()->json(['message' => 'Employee not found'], 404);
-        }
-        return response()->json($employee);
-    }
-
+    
     // Update an employee
     public function update(Request $request, $id)
     {
