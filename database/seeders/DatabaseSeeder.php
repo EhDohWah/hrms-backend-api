@@ -20,13 +20,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(10)->create();
-        Employee::factory(10)->create();
-        EmploymentType::factory(3)->create();
-        Position::factory(5)->create();
-        Department::factory(4)->create();
-        WorkLocation::factory(2)->create();
-        Employment::factory(10)->create();
+        $this->call([
+            RolesAndPermissionsSeeder::class,
+            DepartmentSeeder::class,
+            WorkLocationSeeder::class,
+            EmployeeSeeder::class,
+            EmploymentTypeSeeder::class,
+            PositionSeeder::class,
+            EmploymentSeeder::class,
+        ]);
+
+
+        // User::factory(10)->create();
+        // Employee::factory(10)->create();
+        // EmploymentType::factory(3)->create();
+        // Position::factory(5)->create();
+        // Department::factory(4)->create();
+        // WorkLocation::factory(2)->create();
+        // Employment::factory(10)->create();
 
         // User::factory()->create([
         //     'name' => 'Test User',

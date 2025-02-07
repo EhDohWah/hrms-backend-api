@@ -1,0 +1,2127 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "HRMS API Documentation",
+        "description": "HRMS Backend API documentation with OpenAPI/Swagger",
+        "contact": {
+            "email": "admin@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000/api/v1",
+            "description": "Local API Server"
+        }
+    ],
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Authenticate user and get token",
+                "description": "Login with email and password to receive JWT token",
+                "operationId": "99d66635c4992aeaa6aa44ff653d0563",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "admin123"
+                                    },
+                                    "remember_me": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer",
+                                            "example": 3600
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "System Administrator"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "admin@example.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "admin"
+                                                },
+                                                "last_login_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "last_login_ip": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid credentials"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too many login attempts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Too many login attempts"
+                                        },
+                                        "seconds_remaining": {
+                                            "type": "integer",
+                                            "example": 300
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register a new user",
+                "description": "Create a new user account with role assignment",
+                "operationId": "08136088c4862c313b35d6518bab8d3a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john.doe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "StrongPass123!"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "StrongPass123!"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "admin",
+                                            "manager",
+                                            "employee"
+                                        ],
+                                        "example": "employee"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Registration successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout user",
+                "description": "Invalidate the current JWT token",
+                "operationId": "6abf3b64a4bc7838d56346f05a5153af",
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged out",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successfully logged out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/user": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Get authenticated user",
+                "description": "Get current authenticated user's details with permissions",
+                "operationId": "32d03117b496ae02c2543b61438d24ad",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "role": {
+                                                    "type": "string"
+                                                },
+                                                "last_login_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "permissions": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Refresh token",
+                "description": "Get a new token using current valid token",
+                "operationId": "e7ab7446393758bb71fd1946a349e500",
+                "responses": {
+                    "200": {
+                        "description": "Token refreshed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token has expired or is invalid"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/forgot-password": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Send password reset link",
+                "description": "Send a password reset link to user's email",
+                "operationId": "fea89d2766defe4ad877001920e3f289",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Reset link sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Password reset link sent to your email"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too many reset attempts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "seconds_remaining": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/reset-password": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Reset password",
+                "description": "Reset user's password using token from email",
+                "operationId": "b8d03d5b689dcb65d3771f62d4f90a24",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "NewStrongPass123!"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "NewStrongPass123!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password reset successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Password reset successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/employees": {
+            "get": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Get list of all employees",
+                "operationId": "9aeb15c3a8c5b0b8b9e0931d1673e787",
+                "responses": {
+                    "200": {
+                        "description": "List of employees",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "staff_id": {
+                                                "type": "string",
+                                                "example": "EMP001"
+                                            },
+                                            "subsidiary": {
+                                                "type": "string",
+                                                "example": "SMRU"
+                                            },
+                                            "first_name": {
+                                                "type": "string",
+                                                "example": "John"
+                                            },
+                                            "middle_name": {
+                                                "type": "string",
+                                                "example": "William"
+                                            },
+                                            "last_name": {
+                                                "type": "string",
+                                                "example": "Doe"
+                                            },
+                                            "gender": {
+                                                "type": "string",
+                                                "example": "male"
+                                            },
+                                            "date_of_birth": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "1990-01-01"
+                                            },
+                                            "status": {
+                                                "type": "string",
+                                                "example": "active"
+                                            },
+                                            "mobile_phone": {
+                                                "type": "string",
+                                                "example": "+1234567890"
+                                            },
+                                            "user": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "format": "email",
+                                                        "example": "john.doe@example.com"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Create a new employee",
+                "operationId": "2475af536398d342aca2fd7f60f9af3a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "staff_id",
+                                    "first_name",
+                                    "last_name",
+                                    "gender",
+                                    "date_of_birth"
+                                ],
+                                "properties": {
+                                    "staff_id": {
+                                        "type": "string",
+                                        "example": "EMP001"
+                                    },
+                                    "subsidiary": {
+                                        "type": "string",
+                                        "example": "SMRU"
+                                    },
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "middle_name": {
+                                        "type": "string",
+                                        "example": "William"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "male"
+                                    },
+                                    "date_of_birth": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1990-01-01"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active"
+                                    },
+                                    "mobile_phone": {
+                                        "type": "string",
+                                        "example": "+1234567890"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Employee created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/employees/{id}": {
+            "get": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Get employee details",
+                "operationId": "41cfd4a7b54d2f35c31ad2afd9d37f3f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Employee ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Employee details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Employee"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Employee not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Update employee details",
+                "operationId": "f1e833660cfbccbfbdef00c84e24c5cb",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Employee ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Employee"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Employee updated successfully"
+                    },
+                    "404": {
+                        "description": "Employee not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Delete an employee",
+                "operationId": "12f385259154107ce23e13cf62d2c158",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Employee ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Employee deleted successfully"
+                    },
+                    "404": {
+                        "description": "Employee not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/employees/search": {
+            "get": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Search employees by name or ID",
+                "operationId": "b17e05f36af68884a7e9bc492f606da0",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search term for name or staff ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Search results",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Employee"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/permissions": {
+            "get": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Get list of all permissions",
+                "description": "Returns paginated list of permissions",
+                "operationId": "92174e83c707809850676c48ddcf726d",
+                "parameters": [
+                    {
+                        "name": "module",
+                        "in": "query",
+                        "description": "Filter by module name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "action",
+                        "in": "query",
+                        "description": "Filter by action type",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "read",
+                                "write",
+                                "create",
+                                "delete",
+                                "import",
+                                "export"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search in name, description, or module",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string"
+                                                    },
+                                                    "module": {
+                                                        "type": "string"
+                                                    },
+                                                    "action": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Insufficient permissions"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Create a new permission",
+                "description": "Creates a new permission with specified module and action",
+                "operationId": "05ed0cdb4abfced8a5e7dfa615768823",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "module",
+                                    "action"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Read Employees"
+                                    },
+                                    "module": {
+                                        "type": "string",
+                                        "example": "employees"
+                                    },
+                                    "action": {
+                                        "type": "string",
+                                        "enum": [
+                                            "read",
+                                            "write",
+                                            "create",
+                                            "delete",
+                                            "import",
+                                            "export"
+                                        ]
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Permission created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Insufficient permissions"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/permissions/{id}": {
+            "get": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Get permission details",
+                "description": "Returns detailed information about a specific permission",
+                "operationId": "89e4d6bc05d76b9667eb6b0c1d86c1fc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Permission ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Insufficient permissions"
+                    },
+                    "404": {
+                        "description": "Permission not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Update permission details",
+                "description": "Updates an existing permission's information",
+                "operationId": "32db2489ce28e57dd00a6f3324efc828",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Permission ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "module",
+                                    "action"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "module": {
+                                        "type": "string"
+                                    },
+                                    "action": {
+                                        "type": "string",
+                                        "enum": [
+                                            "read",
+                                            "write",
+                                            "create",
+                                            "delete",
+                                            "import",
+                                            "export"
+                                        ]
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Permission updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Insufficient permissions"
+                    },
+                    "404": {
+                        "description": "Permission not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Delete a permission",
+                "description": "Deletes a permission if it's not in use",
+                "operationId": "214c1a8a52aa98374e65be8c9f26005e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Permission ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permission deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Insufficient permissions"
+                    },
+                    "404": {
+                        "description": "Permission not found"
+                    },
+                    "422": {
+                        "description": "Cannot delete permission in use"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/permissions/modules": {
+            "get": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Get all permission modules",
+                "description": "Returns list of all modules with their available permissions",
+                "operationId": "e417d80c505d0307a1ac9572cf396f20",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "actions": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "action": {
+                                                                    "type": "string"
+                                                                },
+                                                                "description": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Insufficient permissions"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/permissions/generate": {
+            "post": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Generate module permissions",
+                "description": "Generates default permissions for a specified module",
+                "operationId": "bc65f0304273eccb0929863f3162d47f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "module"
+                                ],
+                                "properties": {
+                                    "module": {
+                                        "type": "string",
+                                        "example": "employees"
+                                    },
+                                    "actions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "enum": [
+                                                "read",
+                                                "write",
+                                                "create",
+                                                "delete",
+                                                "import",
+                                                "export"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Permissions generated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Insufficient permissions"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/roles": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Get list of all roles",
+                "description": "Returns paginated list of roles with their permissions",
+                "operationId": "ba50ce69f980ab35a9463c42e4b4b932",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter roles by status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "inactive"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search roles by name or description",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Administrator"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string",
+                                                        "example": "admin"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Super admin with full access"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "active"
+                                                    },
+                                                    "permissions": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "slug": {
+                                                                    "type": "string"
+                                                                },
+                                                                "module": {
+                                                                    "type": "string"
+                                                                },
+                                                                "action": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Insufficient permissions"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Create a new role",
+                "description": "Creates a new role with specified permissions",
+                "operationId": "295391adbd51895625231808e6fc9ed8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Project Manager"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Manages project teams"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "inactive"
+                                        ],
+                                        "example": "active"
+                                    },
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Role created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Role created successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Insufficient permissions"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/roles/{id}": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Get role details",
+                "description": "Returns detailed information about a specific role",
+                "operationId": "c15c14a048e8031f79144b0a83716491",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Role ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Insufficient permissions"
+                    },
+                    "404": {
+                        "description": "Role not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Update role details",
+                "description": "Updates an existing role's information",
+                "operationId": "7812777d71ad530db91b8b163d93b9a0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Role ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "inactive"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Role updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Insufficient permissions"
+                    },
+                    "404": {
+                        "description": "Role not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Delete a role",
+                "description": "Deletes a role if it's not a system role",
+                "operationId": "cfd8457158ec77a99b27b425d3d99515",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Role ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Role deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized or Cannot delete system role"
+                    },
+                    "404": {
+                        "description": "Role not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/roles/{id}/permissions": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Get role permissions",
+                "description": "Returns permissions for a specific role grouped by module",
+                "operationId": "6c4b7b5742c98fc8de4428d4499c5b0f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Role ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "role_id": {
+                                                    "type": "integer"
+                                                },
+                                                "role_name": {
+                                                    "type": "string"
+                                                },
+                                                "modules": {
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Insufficient permissions"
+                    },
+                    "404": {
+                        "description": "Role not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Update role permissions",
+                "description": "Updates the permissions assigned to a role",
+                "operationId": "81cd4ba2973c99f961c03264be2ea5ea",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Role ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "permissions"
+                                ],
+                                "properties": {
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Permissions updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Insufficient permissions"
+                    },
+                    "404": {
+                        "description": "Role not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Employee": {
+                "required": [
+                    "staff_id",
+                    "first_name",
+                    "last_name",
+                    "gender",
+                    "date_of_birth",
+                    "status"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "staff_id": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "subsidiary": {
+                        "type": "string",
+                        "default": "SMRU",
+                        "enum": [
+                            "SMRU",
+                            "BHF"
+                        ]
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "middle_name": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "nullable": true
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "gender": {
+                        "type": "string",
+                        "maxLength": 10
+                    },
+                    "date_of_birth": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "status": {
+                        "type": "string",
+                        "default": "active",
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ]
+                    },
+                    "religion": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "nullable": true
+                    },
+                    "birth_place": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "nullable": true
+                    },
+                    "identification_number": {
+                        "type": "string",
+                        "maxLength": 50,
+                        "nullable": true
+                    },
+                    "passport_number": {
+                        "type": "string",
+                        "maxLength": 50,
+                        "nullable": true
+                    },
+                    "bank_name": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "nullable": true
+                    },
+                    "bank_branch": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "nullable": true
+                    },
+                    "bank_account_name": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "nullable": true
+                    },
+                    "bank_account_number": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "nullable": true
+                    },
+                    "office_phone": {
+                        "type": "string",
+                        "maxLength": 20,
+                        "nullable": true
+                    },
+                    "mobile_phone": {
+                        "type": "string",
+                        "maxLength": 20,
+                        "nullable": true
+                    },
+                    "height": {
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true
+                    },
+                    "weight": {
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true
+                    },
+                    "permanent_address": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "current_address": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "stay_with": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "nullable": true
+                    },
+                    "military_status": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "marital_status": {
+                        "type": "string",
+                        "maxLength": 20,
+                        "nullable": true
+                    },
+                    "spouse_name": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "nullable": true
+                    },
+                    "spouse_occupation": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "nullable": true
+                    },
+                    "father_name": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "nullable": true
+                    },
+                    "father_occupation": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "nullable": true
+                    },
+                    "mother_name": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "nullable": true
+                    },
+                    "mother_occupation": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "nullable": true
+                    },
+                    "driver_license_number": {
+                        "type": "string",
+                        "maxLength": 50,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "API Endpoints for user authentication"
+        },
+        {
+            "name": "Employees",
+            "description": "API Endpoints for Employee management"
+        },
+        {
+            "name": "Permissions",
+            "description": "API Endpoints for Permission management"
+        },
+        {
+            "name": "Roles",
+            "description": "API Endpoints for Role management"
+        }
+    ]
+}

@@ -6,32 +6,47 @@ use App\Models\Employee;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Models\WorkLocation;
 
-
+/**
+ * @OA\Tag(
+ *     name="Employees",
+ *     description="API Endpoints for Employee management"
+ * )
+ */
 class EmployeeController extends Controller
 {
-    // Get all employees
-    // public function index()
-    // {
-    //     $employees = Employee::with([
-    //         'user:id,email',
-    //         'employments' => function($query) {
-    //             $query->select('id', 'employee_id', 'employment_type_id', 'position_id', 'department_id', 'work_location_id', 'supervisor_id')
-    //                 ->with([
-    //                     'employmentType:id,name',
-    //                     'position:id,title',
-    //                     'department:id,name',
-    //                     'workLocation:id,name,type',
-    //                     'supervisor:id,first_name,last_name'
-    //                 ]);
-    //         }
-    //     ])
-    //     ->whereHas('employments')
-    //     ->get(['id', 'user_id', 'staff_id', 'first_name', 'middle_name', 'last_name', 'mobile_phone', 'status']); // Select only necessary columns from the Employee table
-
-    //     return response()->json($employees);
-    // }
-
+    /**
+     * @OA\Get(
+     *     path="/employees",
+     *     summary="Get list of all employees",
+     *     tags={"Employees"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of employees",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="staff_id", type="string", example="EMP001"),
+     *                 @OA\Property(property="subsidiary", type="string", example="SMRU"),
+     *                 @OA\Property(property="first_name", type="string", example="John"),
+     *                 @OA\Property(property="middle_name", type="string", example="William"),
+     *                 @OA\Property(property="last_name", type="string", example="Doe"),
+     *                 @OA\Property(property="gender", type="string", example="male"),
+     *                 @OA\Property(property="date_of_birth", type="string", format="date", example="1990-01-01"),
+     *                 @OA\Property(property="status", type="string", example="active"),
+     *                 @OA\Property(property="mobile_phone", type="string", example="+1234567890"),
+     *                 @OA\Property(property="user", type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="email", type="string", format="email", example="john.doe@example.com")
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
     public function index(Request $request)
     {
         $employees = Employee::with([
@@ -52,7 +67,7 @@ class EmployeeController extends Controller
                 if ($request->has('department_id')) {
                     $query->where('department_id', $request->department_id);
                 }
-                
+
                 // Add site (work location) filter
                 if ($request->has('site_id')) {
                     $query->where('work_location_id', $request->site_id);
@@ -63,7 +78,30 @@ class EmployeeController extends Controller
         return response()->json($employees);
     }
 
-    // Get a single employee by ID
+    /**
+     * @OA\Get(
+     *     path="/employees/{id}",
+     *     summary="Get employee details",
+     *     tags={"Employees"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Employee ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Employee details",
+     *         @OA\JsonContent(ref="#/components/schemas/Employee")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Employee not found"
+     *     )
+     * )
+     */
     public function show($id)
     {
         $employee = Employee::with([
@@ -133,6 +171,28 @@ class EmployeeController extends Controller
     //     return response()->json($employees);
     // }
 
+    /**
+     * @OA\Get(
+     *     path="/employees/search",
+     *     summary="Search employees by name or ID",
+     *     tags={"Employees"},
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         required=true,
+     *         description="Search term for name or staff ID",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Search results",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Employee")
+     *         )
+     *     )
+     * )
+     */
     public function search(Request $request)
     {
         $request->validate([
@@ -146,16 +206,16 @@ class EmployeeController extends Controller
         $search = $request->input('search');
 
         $employees = Employee::select([
-                'id', 'user_id', 'staff_id', 
-                'first_name', 'middle_name', 
+                'id', 'user_id', 'staff_id',
+                'first_name', 'middle_name',
                 'last_name', 'mobile_phone', 'status'
             ])
             ->with([
                 'user:id,email',
                 'employments' => function($query) {
                     $query->select(
-                        'id', 'employee_id', 'employment_type_id', 
-                        'position_id', 'department_id', 
+                        'id', 'employee_id', 'employment_type_id',
+                        'position_id', 'department_id',
                         'work_location_id', 'supervisor_id'
                     )
                     ->with([
@@ -179,7 +239,37 @@ class EmployeeController extends Controller
         return response()->json($employees);
     }
 
-    // Store a new employee
+    /**
+     * @OA\Post(
+     *     path="/employees",
+     *     summary="Create a new employee",
+     *     tags={"Employees"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"staff_id","first_name","last_name","gender","date_of_birth"},
+     *             @OA\Property(property="staff_id", type="string", example="EMP001"),
+     *             @OA\Property(property="subsidiary", type="string", example="SMRU"),
+     *             @OA\Property(property="first_name", type="string", example="John"),
+     *             @OA\Property(property="middle_name", type="string", example="William"),
+     *             @OA\Property(property="last_name", type="string", example="Doe"),
+     *             @OA\Property(property="gender", type="string", example="male"),
+     *             @OA\Property(property="date_of_birth", type="string", format="date", example="1990-01-01"),
+     *             @OA\Property(property="status", type="string", example="active"),
+     *             @OA\Property(property="mobile_phone", type="string", example="+1234567890")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Employee created successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
+     *     )
+     * )
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -226,8 +316,33 @@ class EmployeeController extends Controller
         ], 201);
     }
 
-    
-    // Update an employee
+    /**
+     * @OA\Put(
+     *     path="/employees/{id}",
+     *     summary="Update employee details",
+     *     tags={"Employees"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Employee ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/Employee")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Employee updated successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Employee not found"
+     *     )
+     * )
+     */
     public function update(Request $request, $id)
     {
         $employee = Employee::find($id);
@@ -275,7 +390,29 @@ class EmployeeController extends Controller
         return response()->json($employee);
     }
 
-    // Delete an employee
+    /**
+     * @OA\Delete(
+     *     path="/employees/{id}",
+     *     summary="Delete an employee",
+     *     tags={"Employees"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Employee ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Employee deleted successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Employee not found"
+     *     )
+     * )
+     */
     public function destroy($id)
     {
         $employee = Employee::find($id);
@@ -285,5 +422,13 @@ class EmployeeController extends Controller
 
         $employee->delete();
         return response()->json(['message' => 'Employee deleted successfully']);
+    }
+
+
+    // Get Site records
+    public function getSiteRecords()
+    {
+        $sites = WorkLocation::all();
+        return response()->json($sites);
     }
 }

@@ -7,6 +7,48 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\User;
 use App\Models\Employment;
 
+/**
+ * @OA\Schema(
+ *     schema="Employee",
+ *     required={"staff_id", "first_name", "last_name", "gender", "date_of_birth", "status"},
+ *     @OA\Property(property="id", type="integer", format="int64", readOnly=true),
+ *     @OA\Property(property="staff_id", type="string", maxLength=50),
+ *     @OA\Property(property="subsidiary", type="string", enum={"SMRU", "BHF"}, default="SMRU"),
+ *     @OA\Property(property="user_id", type="integer", nullable=true),
+ *     @OA\Property(property="first_name", type="string", maxLength=255),
+ *     @OA\Property(property="middle_name", type="string", maxLength=255, nullable=true),
+ *     @OA\Property(property="last_name", type="string", maxLength=255),
+ *     @OA\Property(property="gender", type="string", maxLength=10),
+ *     @OA\Property(property="date_of_birth", type="string", format="date"),
+ *     @OA\Property(property="status", type="string", enum={"active", "inactive"}, default="active"),
+ *     @OA\Property(property="religion", type="string", maxLength=100, nullable=true),
+ *     @OA\Property(property="birth_place", type="string", maxLength=100, nullable=true),
+ *     @OA\Property(property="identification_number", type="string", maxLength=50, nullable=true),
+ *     @OA\Property(property="passport_number", type="string", maxLength=50, nullable=true),
+ *     @OA\Property(property="bank_name", type="string", maxLength=100, nullable=true),
+ *     @OA\Property(property="bank_branch", type="string", maxLength=100, nullable=true),
+ *     @OA\Property(property="bank_account_name", type="string", maxLength=100, nullable=true),
+ *     @OA\Property(property="bank_account_number", type="string", maxLength=100, nullable=true),
+ *     @OA\Property(property="office_phone", type="string", maxLength=20, nullable=true),
+ *     @OA\Property(property="mobile_phone", type="string", maxLength=20, nullable=true),
+ *     @OA\Property(property="height", type="number", format="float", nullable=true),
+ *     @OA\Property(property="weight", type="number", format="float", nullable=true),
+ *     @OA\Property(property="permanent_address", type="string", nullable=true),
+ *     @OA\Property(property="current_address", type="string", nullable=true),
+ *     @OA\Property(property="stay_with", type="string", maxLength=100, nullable=true),
+ *     @OA\Property(property="military_status", type="boolean", default=false),
+ *     @OA\Property(property="marital_status", type="string", maxLength=20, nullable=true),
+ *     @OA\Property(property="spouse_name", type="string", maxLength=100, nullable=true),
+ *     @OA\Property(property="spouse_occupation", type="string", maxLength=100, nullable=true),
+ *     @OA\Property(property="father_name", type="string", maxLength=100, nullable=true),
+ *     @OA\Property(property="father_occupation", type="string", maxLength=100, nullable=true),
+ *     @OA\Property(property="mother_name", type="string", maxLength=100, nullable=true),
+ *     @OA\Property(property="mother_occupation", type="string", maxLength=100, nullable=true),
+ *     @OA\Property(property="driver_license_number", type="string", maxLength=50, nullable=true),
+ *     @OA\Property(property="created_at", type="string", format="date-time", readOnly=true),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", readOnly=true)
+ * )
+ */
 class Employee extends Model
 {
     use HasFactory;
@@ -14,6 +56,8 @@ class Employee extends Model
     //
     protected $fillable = [
         'staff_id',
+        'subsidiary',
+        'user_id',
         'first_name',
         'middle_name',
         'last_name',
@@ -48,9 +92,16 @@ class Employee extends Model
         'updated_by'
     ];
 
+    protected $casts = [
+        'date_of_birth' => 'date',
+        'military_status' => 'boolean',
+        'height' => 'float',
+        'weight' => 'float'
+    ];
+
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 
     public function employments()

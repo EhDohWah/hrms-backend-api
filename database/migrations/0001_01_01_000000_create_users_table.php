@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -17,11 +17,13 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamp('last_login_at')->nullable();
+            $table->string('last_login_ip')->nullable();
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
             $table->rememberToken();
             $table->timestamps();
-            $table->string('created_by', 255)->nullable();
-            $table->string('updated_by', 255)->nullable();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -49,4 +51,4 @@ return new class extends Migration
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }
-};
+}

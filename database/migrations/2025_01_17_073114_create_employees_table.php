@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->string('staff_id', 50)->unique(); // staff_id is unique
+            //add subsdiary id
+            $table->enum('subsidiary', ['SMRU', 'BHF'])->default('SMRU'); // subsidiary is required
             $table->unsignedBigInteger('user_id')->nullable(); // user_id is optional
             $table->string('first_name', 255); // first_name is required
             $table->string('middle_name', 255)->nullable(); // middle_name is optional
